@@ -59,7 +59,7 @@ class BaseETL(abc.ABC):
     @abc.abstractmethod
     def extract(self) -> None:
         """
-        Estrai os dados do objeto
+        Extrai os dados do objeto
         """
         pass
 
