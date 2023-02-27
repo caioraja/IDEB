@@ -80,17 +80,3 @@ class BaseINEPETL(abc.ABC):
         """
         pass
 
-    def load(self) -> None:
-        """
-        Exporta os dados transformados
-        """
-        for arq, df in self.dados_saida.items():
-            df.to_parquet(self.caminho_saida / arq, index=False)
-
-    def pipeline(self) -> None:
-        """
-        Executa o pipeline completo de tratamento de dados
-        """
-        self.extract()
-        self.transform()
-        self.load()
