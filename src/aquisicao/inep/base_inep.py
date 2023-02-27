@@ -8,6 +8,7 @@ import urllib
 import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
+from utils.web import download_dados_web
 
 
 class BaseINEPETL(abc.ABC):
@@ -38,7 +39,7 @@ class BaseINEPETL(abc.ABC):
 
     def le_pagina_inep(self) -> typing.Dict[str, str]:
         """Realiza o web-scraping da página de dados do INEP
-        
+
         Returns: dicionário com o nome do arquivo e link para a página
         """
         html = urllib.request.urlopen(self.url).read()
@@ -57,7 +58,14 @@ class BaseINEPETL(abc.ABC):
         para_baixar = self.le_pagina_inep()
         baixados = os.listdir(str(self.caminho_entrada))
         return {arq: link for arq, link in para_baixar.items() if arq not in baixados}
-
+    
+    def dowload_conteudo(self) -> None:
+        """Realiza o download dos dados INEP para uma pasta local
+        """
+        for arq, link in self.dicionario_para_baixar():
+            caminho_arq = self.caminho_saida / arq
+            download_dados_web(caminho_arq, link)
+    
     @abc.abstractmethod
     def extract(self) -> None:
         """
