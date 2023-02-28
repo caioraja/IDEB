@@ -1,17 +1,15 @@
 import abc
-from pathlib import Path
 import typing
-import pandas as pd
-from src.aquisicao.base_etl import BaseETL
 import os
 import urllib
-import requests
-from pathlib import Path
+
 from bs4 import BeautifulSoup
-from utils.web import download_dados_web
+
+from src.aquisicao.base_etl import BaseETL
+from src.utils.web import download_dados_web
 
 
-class BaseINEPETL(abc.ABC):
+class BaseINEPETL(BaseETL, abc.ABC):
     """
     Classe que estrutura como qualquer objeto de ETL
     deve funcionar para baixar dados do INEP
@@ -22,7 +20,7 @@ class BaseINEPETL(abc.ABC):
     )
 
     def __init__(
-        self, entrada: str, saida: str, base, criar_caminho: bool = True
+        self, entrada: str, saida: str, base: str, criar_caminho: bool = True
     ) -> None:
         """
         Instancia objeto de ETL do INEP
@@ -42,8 +40,8 @@ class BaseINEPETL(abc.ABC):
 
         Returns: dicionário com o nome do arquivo e link para a página
         """
-        html = urllib.request.urlopen(self.url).read()
-        soup = BeautifulSoup(html, features="lxml")
+        html = urllib.request.urlopen(self._url).read()
+        soup = BeautifulSoup(html, features="html.parser")
         return {
             tag["href"].split("_")[-1]: tag["href"]
             for tag in soup.find_all("a", {"class": "external-link"})
@@ -59,21 +57,22 @@ class BaseINEPETL(abc.ABC):
         baixados = os.listdir(str(self.caminho_entrada))
         return {arq: link for arq, link in para_baixar.items() if arq not in baixados}
     
-    def dowload_conteudo(self) -> None:
+    def download_conteudo(self) -> None:
         """Realiza o download dos dados INEP para uma pasta local
         """
-        for arq, link in self.dicionario_para_baixar():
-            caminho_arq = self.caminho_saida / arq
+        for arq, link in self.dicionario_para_baixar().items():
+            print(arq)
+            caminho_arq = self.caminho_entrada / arq
             download_dados_web(caminho_arq, link)
     
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def extract(self) -> None:
         """
         Extrai os dados do objeto
         """
         pass
 
-    @abc.abstractmethod
+    #@abc.abstractmethod
     def transform(self) -> None:
         """
         Transforma os dados e os adequa para os formatos de saída de interesse
