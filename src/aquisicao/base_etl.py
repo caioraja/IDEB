@@ -12,8 +12,8 @@ class BaseETL(abc.ABC):
 
     caminho_entrada: Path
     caminho_saida: Path
-    _dados_entrada: typing(dict(str, pd.DataFrame))
-    _dados_saida: typing(dict(str, pd.DataFrame))
+    _dados_entrada: typing.Dict[str, pd.DataFrame]
+    _dados_saida: typing.Dict[str, pd.DataFrame]
 
     def __init__(self, entrada: str, saida: str, criar_caminho: bool = True) -> None:
         """
@@ -25,7 +25,7 @@ class BaseETL(abc.ABC):
             criar_caminho (bool, optional): flag indicando se devemos criar os caminhos. Defaults to True.
         """
         self.caminho_entrada = Path(entrada)
-        self.caminho_entrada = Path(saida)
+        self.caminho_saida = Path(saida)
 
         if criar_caminho:
             self.caminho_entrada.mkdir(parents=True, exist_ok=True)
